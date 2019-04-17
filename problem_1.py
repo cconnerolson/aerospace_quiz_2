@@ -1,32 +1,21 @@
-from main import *
 from numpy import zeros, arange
-
-# p1_data = fn.generate_data_array(1)
-
-
-def ideal_thrust(M0, gamma=k.GAMMA, T3t=g.T3t, T0t=g.T0):
-	a0 = fn.speed_of_sound(T=g.T0)
-	f = fn.fuel_ratio(mach=M0)
-	return a0 * M0 * ((1 + f) * math.sqrt(T3t / (T0t * (1 + ((gamma - 1) / (2)) * M0**2))) - 1)
-
-
-# ii = 0
-# for M, T in p1_data:
-#   p1_data[ii, 1] = ideal_thrust(M0=M)
-#   ii += 1
-
-# pd.DataFrame(p1_data).to_csv("data/p1_data.csv")
+import pandas as pd
+import matplotlib.pyplot as plt
+import constant as k
+import given as g
 
 
 class Problem1(object):
 	"""Take-home Quiz 2, Problem 1"""
-	version = '0.1'
+	version = '1.0'
 	
 	def __init__(self, T3t=2000, T0t=223, Pa=16.5, delta=0.01):
 		self.T3t = T3t  # [K]
 		self.T0t = T0t  # [K]
 		self.Pa = Pa  # [K]
+		self.delta = delta
 		self.data = Problem1.empty_data_array(delta)
+		self.execute()
 	
 	def empty_data_array(self, delta=0.01):
 		"""
@@ -36,11 +25,11 @@ class Problem1(object):
 		"""
 		c = int((4 - 1.5) / delta + 1)
 		array = zeros((c, 2))
-		array[:, 0] = arange(1.5, (4.0 + delta), delta)
+		array[:, 0] = arange(1.5, (4 + delta), delta)
 		return array
 	
 	@classmethod
-	def schomate(T, output):
+	def schomate(cls, T, output='c_p'):
 		"""
 		Shchomate equation to calculate specific heat of water vapor for a given temperature T.
 		:param T: Temperature [K]
@@ -85,7 +74,7 @@ class Problem1(object):
 		:param gamma: specific gravity of air
 		:return: speed of sound [m/s]
 		"""
-		return math.sqrt(gamma * R * T)
+		return (gamma * R * T)**0.5
 	
 	def ideal_thrust(self, M0, gamma=1.4):
 		"""
@@ -95,13 +84,44 @@ class Problem1(object):
 		:param T0t:
 		:return: thrust
 		"""
-		a0 = fn.speed_of_sound(T=g.T0)
-		f = fn.fuel_ratio(mach=M0)
-		return a0 * M0 * ((1 + f) * math.sqrt(self.T3t / (self.T0t * (1 + ((gamma - 1) / (2)) * M0**2))) - 1)
+		a0 = Problem1.speed_of_sound()
+		f = Problem1.fuel_ratio(self, mach=M0)
+		return a0 * M0 * ((1 + f) * (self.T3t / (self.T0t * (1 + ((gamma - 1) / (2)) * M0**2)))**0.5 - 1)
 	
 	def loop(self):
-		pass
+		for idx, row in enumerate(self.data):
+			self.data[idx, 1] = Problem1.ideal_thrust(self, M0=(row[0]))
+	
+	def numpy_to_df(self):
+		return pd.DataFrame(self.data, index=arange(1.5, (4 + self.delta), self.delta), columns=['M0', 'T/m'])
+	
+	def plot(self, df):
+		x, y = 'M0', 'T/m'
+		xmax, ymax = df['T/m'].idxmax(), df['T/m'].max()
+		# print(xmax, ymax)
+		df.plot(kind='line', x=x, y=y)
+		plt.title('Specific Thrust vs. Mach Number at Input', fontsize=18, y=1.02)
+		plt.legend().remove()
+		plt.xlabel(r'$M_0$', labelpad=10, fontsize=14)
+		plt.xlim(1.4, 4.1)
+		plt.ylabel(r'$\frac{T}{\dot{m}}$', rotation=0, labelpad=15, fontsize=18)
+		plt.ylim(675, 975)
+		plt.grid()
+		plt.tight_layout()
+		plt.axvline(x=xmax, linestyle='dashed', color='black', alpha=0.5)
+		plt.axhline(y=ymax, linestyle='dashed', color='black', alpha=0.5)
+		plt.plot(xmax, ymax, 'ro')
+		label = 'Maximum Specific Thrust:\n (' + str(round(xmax,2)) + ', ' + str(round(ymax,2)) + ')'
+		plt.annotate(label, xy=(2.5, 800), xytext=((xmax + 0.07), (ymax + 15)), bbox=dict(facecolor='white', edgecolor='black', pad=4))
+		plt.savefig(r'plots/p1_plot.png', bbox_inches='tight', dpi=200)
+		plt.show()
+	
+	def execute(self):
+		Problem1.loop(self)
+		df = Problem1.numpy_to_df(self)
+		Problem1.plot(self, df)
+		df.to_csv(r'data/p1_data.csv')
 
 
+Problem1()
 
-p1 = Problem1()
