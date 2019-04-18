@@ -6,11 +6,11 @@
 
 3) Introduce a diffuser efficiency of &Pi;<sub>d</sub> = 1 − 0.08  (M<sub>0</sub> − 1)<sup>1.1</sup> and assume that the combustor and the nozzle are 100\% efficient and modify design \(2\) to get the most optimal performance and plot specific thrust as a function of flight Mach number in the same 1.5\-4.0 regime.  __**Again don’t neglect fuel air ratio.**__    \(2\)
 
-4) __For the chosen design of problem \(3\),__ i.e, fixed nozzle shape, redo the specific thrust calculations using real properties of the working fluid for computation of fuel air ratio, and exit temperature and Mach Number in the same inlet Mach number regime of 1.5\-4.0.    \(2\)
+4) For the chosen design of problem \(3\), i.e, fixed nozzle shape, redo the specific thrust calculations using real properties of the working fluid for computation of fuel air ratio, and exit temperature and Mach Number in the same inlet Mach number regime of 1.5\-4.0.    \(2\)
 
 
 
-## Design Considerations
+### Design Considerations
 
 1. Ideal (dont neglect *f*).
     * air is a perfect gas; &gamma; = 1.4
@@ -28,6 +28,10 @@
 4. Bring in inefficiencies.
     * tolerable stagnation pressure loss = 10\%
 
-## License
+
+## Running The Code
+
+
+### License
 
 [MIT](https://choosealicense.com/licenses/mit/)

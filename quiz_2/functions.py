@@ -1,5 +1,7 @@
-from main import *
-
+import numpy as np
+import constant as k
+import given as g
+import math
 
 # General
 

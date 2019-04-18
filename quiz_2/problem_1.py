@@ -123,5 +123,5 @@ class Problem1(object):
 		df.to_csv(r'data/p1_data.csv')
 
 
-Problem1()
-
+if __name__ == '__main__':
+	Problem1()
