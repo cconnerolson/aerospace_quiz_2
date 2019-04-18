@@ -31,6 +31,13 @@
 
 ## Running The Code
 
+Run any problem in the terminal as shown below:
+
+`
+~ $ python3 problem_{}.py
+`
+
+
 
 ### License
 
