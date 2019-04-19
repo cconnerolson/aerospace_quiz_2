@@ -33,10 +33,9 @@
 
 Run any problem in the terminal as shown below:
 
-`
-~ $ python3 problem_{}.py
-`
+`~$ python3 /path/problem_{}.py`
 
+Data will be saved to /data/, plots will be saved to /plots/ and opened in their own window.
 
 
 ### License
