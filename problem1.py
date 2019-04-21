@@ -22,29 +22,15 @@ class Problem1(object):
 		self.M0 = 0
 		self.execute()
 	
-	def cli_prompt(self):
-		if self.verbose:
-			print('Options:\n    -r        run script\n    -m        return maximum specific thrust and mach number')
-			option = input(">>> ")
-			if option == '-r':
-				self.execute()
-			elif option == '-m':
-				SF, M0 = self.maximums()
-				print('Maximum Specific Thrust = {}\nOccuring at M0 = {}'.format(SF, M0))
-			else:
-				raise ValueError('Invalid input.')
-		else:
-			self.maximums()
-	
-	def empty_data_array(self, delta=0.01):
+	def empty_data_array(self):
 		"""
 		Creates an empty numpy array for the simulation data
 		:param delta: spacing between data points
 		:return:
 		"""
-		c = int((4 - 1.5) / delta + 1)
+		c = int((4 - 1.5) / self.delta + 1)
 		array = np.zeros((c, 2))
-		array[:, 0] = np.arange(1.5, (4 + delta), delta)
+		array[:, 0] = np.arange(1.5, (4 + self.delta), self.delta)
 		return array
 	
 	def c_p(self, T=k.T0, P=k.Pa):
