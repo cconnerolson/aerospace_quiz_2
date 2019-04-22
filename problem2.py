@@ -176,7 +176,7 @@ class Problem2(object):
 		plt.plot(xmax, ymax, 'ro')
 		label = 'Maximum Specific Thrust = {}\nat $M_0$ = {}'.format(round(ymax, 3), round(xmax, 2))
 		plt.annotate(label, xy=(2.5, 800), xytext=((xmax + 0.08), (ymax + 70)), bbox=dict(facecolor='white', edgecolor='black', pad=4))
-		#plt.savefig(r'plots/p2_plot.png', bbox_inches='tight', dpi=200)
+		plt.savefig(r'plots/p2_plot.png', bbox_inches='tight', dpi=200)
 		plt.show()
 	
 	def execute(self):
