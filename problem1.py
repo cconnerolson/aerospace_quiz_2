@@ -10,27 +10,29 @@ class Problem1(object):
 	"""Take-home Quiz 2, Problem 1"""
 	version = '1.2'
 	
-	def __init__(self, T3t=k.T3t, T0=k.T0, Pa=k.Pa, delta=0.01, verbose=True):
+	def __init__(self, T3t=k.T3t, T0=k.T0, Pa=k.Pa, delta=0.01, gamma=k.GAMMA, verbose=True):
+		self.delta = delta
+		self.data = Problem1.empty_data_array(delta)
 		self.T3t = T3t  # [K]
 		self.T0 = T0  # [K]
 		self.Pa = Pa  # [K]
+		self.gamma = gamma
 		self.air = pm.get('ig.air')
 		self.verbose = verbose
-		self.delta = delta
-		self.data = Problem1.empty_data_array(delta)
 		self.SF = 0
 		self.M0 = 0
 		self.execute()
 	
-	def empty_data_array(self):
+	@classmethod
+	def empty_data_array(cls, delta=0.01):
 		"""
 		Creates an empty numpy array for the simulation data
 		:param delta: spacing between data points
 		:return:
 		"""
-		c = int((4 - 1.5) / self.delta + 1)
-		array = np.zeros((c, 2))
-		array[:, 0] = np.arange(1.5, (4 + self.delta), self.delta)
+		r = int((4 - 1.5) / delta + 1)
+		array = np.zeros((r, 2))
+		array[:, 0] = np.arange(1.5, (4 + delta), delta)
 		return array
 	
 	def c_p(self, T=k.T0, P=k.Pa):
@@ -61,7 +63,7 @@ class Problem1(object):
 		"""
 		return (gamma * R * T)**0.5
 	
-	def ideal_thrust(self, M0, gamma=1.4):
+	def momentum_thrust(self, M0):
 		"""
 		Calculate ideal thrust as a function of Mach number.
 		:param gamma: specific gravity of air
@@ -71,19 +73,23 @@ class Problem1(object):
 		"""
 		a0 = self.speed_of_sound()
 		f = self.fuel_ratio(mach=M0)
-		return a0 * M0 * ((1 + f) * (self.T3t / (self.T0 * (1 + ((gamma - 1) / (2)) * M0**2)))**0.5 - 1)
+		return a0 * M0 * ((1 + f) * (self.T3t / (self.T0 * (1 + ((self.gamma - 1) / 2) * M0**2)))**0.5 - 1)
 	
 	def loop(self):
 		for idx, row in enumerate(self.data):
-			self.data[idx, 1] = self.ideal_thrust(M0=(row[0]))
+			self.data[idx, 1] = self.momentum_thrust(M0=(row[0]))
 	
 	def numpy_to_df(self):
 		return pd.DataFrame(self.data, index=np.arange(1.5, (4 + self.delta), self.delta), columns=['M0', 'T/m'])
 	
+	def maximums(self):
+		self.loop()
+		df = self.numpy_to_df()
+		self.M0, self.SF = df['T/m'].idxmax(), df['T/m'].max()
+	
 	def plot(self, df):
 		x, y = 'M0', 'T/m'
-		xmax, ymax = df['T/m'].idxmax(), df['T/m'].max()
-		# print(xmax, ymax)
+		xmax, ymax = self.M0, self.SF
 		df.plot(kind='line', x=x, y=y)
 		plt.title('Specific Thrust vs. Mach Number at Input', fontsize=18, y=1.02)
 		plt.legend().remove()
@@ -96,7 +102,7 @@ class Problem1(object):
 		plt.axvline(x=xmax, linestyle='dashed', color='black', alpha=0.5)
 		plt.axhline(y=ymax, linestyle='dashed', color='black', alpha=0.5)
 		plt.plot(xmax, ymax, 'ro')
-		label = 'Maximum Specific Thrust =' + str(round(ymax, 2)) + '\nat $M_0$ =' + str(round(xmax, 2))
+		label = 'Maximum Specific Thrust = {}\nat $M_0$ = {}'.format(round(ymax, 3), round(xmax, 2))
 		plt.annotate(label, xy=(2.5, 800), xytext=((xmax + 0.08), (ymax + 18)), bbox=dict(facecolor='white', edgecolor='black', pad=4))
 		plt.savefig(r'plots/p1_plot.png', bbox_inches='tight', dpi=200)
 		plt.show()
@@ -104,18 +110,12 @@ class Problem1(object):
 	def execute(self):
 		self.loop()
 		df = self.numpy_to_df()
+		self.maximums()
 		if self.verbose:
 			self.plot(df)
 			df.to_csv(r'data/p1_data.csv')
-		self.maximums()
-	
-	def maximums(self):
-		self.loop()
-		df = self.numpy_to_df()
-		self.M0, self.SF = round(df['T/m'].idxmax(), 2), round(df['T/m'].max(), 4)
+			print('Maximum Specific Thrust = {}\nOccurring at M0 = {}'.format(round(self.SF, 4), round(self.M0, 2)))
 
 
 if __name__ == '__main__':
 	P1 = Problem1()
-
-
