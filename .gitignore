@@ -1,7 +1,3 @@
-# Stuff
-test.py
-
-
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -109,3 +105,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+
+/test.py
+/equations.tex
+/problem1_1.py
+/problem2_old.py
+/problem2_1old.py
